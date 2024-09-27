@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Media from "../../../Schema/mediaModel";
+import logger from "../../../../logger";
 export const searchTitle = async (
   req: Request,
   res: Response
@@ -7,6 +8,7 @@ export const searchTitle = async (
   const { title } = req.query;
 
   if (!title) {
+      
     res.status(400).json({ message: "Title query parameter is required" });
     return
   }
@@ -16,6 +18,7 @@ export const searchTitle = async (
     res.status(200).json(posts);
     return;
   } catch (error) {
+    logger.error("Server error", error);
     res.status(500).json({ message: "Server error", error });
     return;
   }

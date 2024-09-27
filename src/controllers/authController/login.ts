@@ -4,7 +4,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { log } from 'console';
-
+import logout from './logout';
+import logger from '../../../logger';
 dotenv.config();
 
 const login = async (req: Request, res: Response): Promise<void> => {
@@ -13,8 +14,8 @@ const login = async (req: Request, res: Response): Promise<void> => {
     try {
         // Check if the user exists
         const user = await UserModel.findOne({ email });
-        log(user);
         if (!user) {
+            logger.error('Invalid email or password');
             res.status(400).json({ message: 'Invalid email or password' });
             return;
         }
@@ -22,6 +23,7 @@ const login = async (req: Request, res: Response): Promise<void> => {
         // Compare the provided password with the hashed password in the database
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
+            logger.error('Invalid email or password');
             res.status(400).json({ message: 'Invalid email or password' });
             return;
         }
@@ -37,8 +39,10 @@ const login = async (req: Request, res: Response): Promise<void> => {
             maxAge: 3600000 // 1 hour in milliseconds
         });
         // Respond with the user and token
+
         res.status(200).json({ user, token });
     } catch (error) {
+        logger.error('Server error', error);
         res.status(500).json({ message: 'Server error', error });
     }
 };

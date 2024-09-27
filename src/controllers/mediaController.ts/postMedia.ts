@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import Media from "../../Schema/mediaModel"; // Adjust the import path as needed
+import logger from "../../../logger";
+import { warn } from "console";
 interface AuthenticatedRequest extends Request {
   user?: any; // Adjust type according to your schema
 }
@@ -13,6 +15,7 @@ const createMedia = async (
   try {
     // Validate the input data
     if (!title || !content) {
+      logger.warn("Title and content are required");
       res.status(400).json({ message: "Title and content are required" });
       return;
     }
@@ -32,6 +35,7 @@ const createMedia = async (
     // Respond with the created media document
     res.status(201).json(newMedia);
   } catch (error) {
+    logger.error("Server error", error);
     res.status(500).json({ message: "Server error", error });
   }
 };

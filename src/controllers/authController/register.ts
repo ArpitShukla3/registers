@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { log } from 'console';
+import logger from '../../../logger';
 dotenv.config();
 
 const register = async (req: Request, res: Response): Promise<void> => {
@@ -13,6 +14,7 @@ const register = async (req: Request, res: Response): Promise<void> => {
         // Validate user data with Zod schema
         const validateUserResult = validateUser({ name, email, password });
         if (!validateUserResult.success) {
+            logger.error(validateUserResult.error);
             res.status(400).json({ message: validateUserResult.error });
             return;
         }
@@ -21,6 +23,7 @@ const register = async (req: Request, res: Response): Promise<void> => {
         // log("Checking if user exists");
         const existingUser = await UserModel.findOne({ email });
         if (existingUser) {
+            logger.error('User already exists');
             res.status(400).json({ message: 'User already exists' });
             return;
         }
@@ -51,6 +54,7 @@ const register = async (req: Request, res: Response): Promise<void> => {
         // Respond with the new user and token
         res.status(201).json({ user: newUser, token });
     } catch (error) {
+        logger.error('Server error', error);
         res.status(500).json({ message: 'Server error', error });
     }
 };

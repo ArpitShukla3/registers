@@ -5,6 +5,7 @@ import connectDb from "./connection/connectMongoDb";
 import mediaRouter from "./Router/media";
 import cookieParser from "cookie-parser";
 import cors from "cors"; // Import cors
+import logger from "../logger";
 
 dotenv.config();
 const app = express();
@@ -29,5 +30,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  logger.info(`Server is running on port ${port}`);
 });

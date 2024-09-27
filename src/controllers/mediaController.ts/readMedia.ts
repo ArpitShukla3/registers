@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Media from "../../Schema/mediaModel";
 import { log } from "console";
-
+import logger from "../../../logger";
 interface AuthenticatedRequest extends Request {
   user?: any; // Adjust type according to your schema
 }
@@ -37,6 +37,7 @@ export const getMediaByUser = async (
       media,
     });
   } catch (error) {
+    logger.error("Error retrieving media", error);
     res.status(500).json({ message: "Error retrieving media", error });
   }
 };
