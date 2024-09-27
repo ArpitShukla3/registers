@@ -4,10 +4,22 @@ import dotenv from "dotenv";
 import connectDb from "./connection/connectMongoDb";
 import mediaRouter from "./Router/media";
 import cookieParser from "cookie-parser";
+import cors from "cors"; // Import cors
+
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 connectDb();
+
+// Configure CORS
+const corsOptions = {
+  origin: "*", // Allow all origins. You can specify specific origins here.
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions)); // Use cors middleware
 app.use(express.json());
 app.use(cookieParser());
 app.use("/auth", authRouter);
