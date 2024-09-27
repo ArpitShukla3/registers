@@ -1,10 +1,16 @@
 import { Request, Response } from 'express';
 import Media from '../../Schema/mediaModel';
-export const getPostByID = async (req: Request, res: Response): Promise<void> => {
+import { AuthenticatedRequest } from '../../types/AuthenticatedRequest';
+export const getPostByID = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const postId = req.params.id;
 
     try {
         const post = await Media.findById(postId);
+        if(post?.user != req.user._id) {
+            console.log(post?.user, req.user._id);
+            res.status(403).json({ message: 'Unauthorized' });
+            return;
+        }
         if (!post) {
             res.status(404).json({ message: 'Post not found' });
             return;

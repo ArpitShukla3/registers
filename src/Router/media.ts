@@ -20,7 +20,7 @@ router.get("/read", middleAuth,getMediaByUser);
 // Delete a media item by id
 router.delete("/delete/:id",middleAuth,deleteMedia);
 // Read a single media item by id
-router.get("/media/:id",middleAuth,getPostByID);
+router.get("/readSingle/:id",middleAuth,getPostByID);
 
 
 const mediaRouter = router;
