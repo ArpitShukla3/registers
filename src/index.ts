@@ -1,11 +1,18 @@
 import express from "express";
-import authRouter from "./Router/authRouter";
 import dotenv from "dotenv";
 import connectDb from "./connection/connectMongoDb";
-import mediaRouter from "./Router/media";
 import cookieParser from "cookie-parser";
 import cors from "cors"; // Import cors
 import logger from "../logger";
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import http from 'http';
+import typeDefs from './graphql/schema';
+import resolvers from './graphql/resolvers';
+import authRouter from "./Router/authRouter";
+import mediaRouter from "./Router/media";
 
 dotenv.config();
 const app = express();
@@ -29,6 +36,31 @@ app.get("/", (req, res) => {
   res.send("Hello, world!");
 });
 
-app.listen(port, () => {
-  logger.info(`Server is running on port ${port}`);
-});
+async function startApolloServer() {
+  const httpServer = http.createServer(app);
+
+  const schema = makeExecutableSchema({ typeDefs, resolvers });
+
+  const server = new ApolloServer({
+    schema,
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  });
+
+  await server.start();
+
+  app.use(
+    '/graphql',
+    cors<cors.CorsRequest>(),
+    express.json(),
+    expressMiddleware(server, {
+      context: async ({ req, res }) => ({ req, res }), // Ensure context includes req and res
+    })
+  );
+
+  httpServer.listen(port, () => {
+    logger.info(`Server is running on port ${port}`);
+    logger.info(`GraphQL server is running at http://localhost:${port}/graphql`);
+  });
+}
+
+startApolloServer();
