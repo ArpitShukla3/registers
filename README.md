@@ -1,4 +1,3 @@
-Sure, here's a README file for the project:
 
 # RaftLabs Media Management Application
 
@@ -89,11 +88,3 @@ The server will start running on `http://localhost:3000`.
 - `POST /graphqlMedia`: GraphQL endpoint for media-related operations (authentication required)
 
 Please refer to the `src/graphql/user/schema.ts` and `src/graphql/media/schema.ts` files for the GraphQL schema definitions and available queries and mutations.
-
-## Contributing
-
-Contributions are welcome! Please follow the guidelines in the [CONTRIBUTING.md](CONTRIBUTING.md) file.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
