@@ -1,10 +1,10 @@
-import { UserModel } from "../Schema/UserModel";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import { AuthenticationError } from "apollo-server-express";
-import logger from "../../logger";
 import { log } from "console";
+import logger from "../../../logger";
+import { UserModel } from "../../Schema/UserModel";
 const resolvers = {
     Query: {
         users: async () => {
@@ -32,7 +32,7 @@ const resolvers = {
                 logger.warn("Invalid credentials");
                 throw new AuthenticationError("Invalid credentials");
             }
-            const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, { expiresIn: "1d" });
+            const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET!, { expiresIn: "1h" });
             res.cookie("token", token, { httpOnly: true });
             logger.info("Logged in");
             return user;
@@ -44,5 +44,5 @@ const resolvers = {
         },
     },
 };
-
-export default resolvers;
+const userResolvers = resolvers;
+export default userResolvers;

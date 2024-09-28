@@ -4,15 +4,18 @@ import connectDb from "./connection/connectMongoDb";
 import cookieParser from "cookie-parser";
 import cors from "cors"; // Import cors
 import logger from "../logger";
-import { ApolloServer } from '@apollo/server';
-import { expressMiddleware } from '@apollo/server/express4';
-import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
-import { makeExecutableSchema } from '@graphql-tools/schema';
-import http from 'http';
-import typeDefs from './graphql/schema';
-import resolvers from './graphql/resolvers';
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@apollo/server/express4";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
+import { makeExecutableSchema } from "@graphql-tools/schema";
+import http from "http";
+import userTypeDefs from "./graphql/user/schema";
+import mediaTypeDefs from "./graphql/media/schema";
+import userResolvers from "./graphql/user/resolvers";
+import mediaResolvers from "./graphql/media/resolver";
 import authRouter from "./Router/authRouter";
 import mediaRouter from "./Router/media";
+import middleAuth from "./middleware/middleAuth";
 
 dotenv.config();
 const app = express();
@@ -24,7 +27,7 @@ const corsOptions = {
   origin: "*", // Allow all origins. You can specify specific origins here.
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-  optionsSuccessStatus: 204
+  optionsSuccessStatus: 204,
 };
 
 app.use(cors(corsOptions)); // Use cors middleware
@@ -39,7 +42,11 @@ app.get("/", (req, res) => {
 async function startApolloServer() {
   const httpServer = http.createServer(app);
 
-  const schema = makeExecutableSchema({ typeDefs, resolvers });
+  // Combine typeDefs and resolvers
+  const schema = makeExecutableSchema({
+    typeDefs: [userTypeDefs, mediaTypeDefs],
+    resolvers: [userResolvers, mediaResolvers],
+  });
 
   const server = new ApolloServer({
     schema,
@@ -48,8 +55,22 @@ async function startApolloServer() {
 
   await server.start();
 
+  // Route for /graphqlUser without middleAuth
   app.use(
-    '/graphql',
+    "/graphqlUser",
+    cors<cors.CorsRequest>(),
+    express.json(),
+    expressMiddleware(server, {
+      context: async ({ req, res }) => ({ req, res }), // Ensure context includes req and res
+    })
+  );
+
+  // Apply middleAuth middleware for /graphqlMedia
+  app.use(middleAuth);
+
+  // Route for /graphqlMedia with middleAuth
+  app.use(
+    "/graphqlMedia",
     cors<cors.CorsRequest>(),
     express.json(),
     expressMiddleware(server, {
@@ -59,7 +80,9 @@ async function startApolloServer() {
 
   httpServer.listen(port, () => {
     logger.info(`Server is running on port ${port}`);
-    logger.info(`GraphQL server is running at http://localhost:${port}/graphql`);
+    logger.info(
+      `GraphQL server is running at http://localhost:${port}/graphqlUser and http://localhost:${port}/graphqlMedia`
+    );
   });
 }
 

@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { UserModel } from "../Schema/UserModel";
 import logger from "../../logger";
+import { log } from "console";
 dotenv.config();
 
 interface AuthenticatedRequest extends Request {
@@ -27,7 +28,6 @@ const middleAuth = async (
       id: string;
     };
     const user = await UserModel.findById(decoded.id) as { _id: string };
-
     if (!user) {
       logger.warn("Access denied. User not found.");
       res.status(401).json({ message: "Access denied. User not found." });

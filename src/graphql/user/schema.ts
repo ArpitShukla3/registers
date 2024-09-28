@@ -21,5 +21,5 @@ const typeDefs = gql`
     logout: Boolean!
   }
 `;
-
-export default typeDefs;
+const userTypeDefs = typeDefs;
+export default userTypeDefs;
