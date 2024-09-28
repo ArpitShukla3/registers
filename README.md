@@ -2,7 +2,7 @@ Sure, here's a README file for the project:
 
 # RaftLabs Media Management Application
 
-This is a Node.js server application built with TypeScript, Express, and MongoDB. It provides functionality for user authentication and media management.
+This is a Node.js server application built with TypeScript, Express, and MongoDB. It provides functionality for user authentication and media management, with support for GraphQL API.
 
 ## Features
 
@@ -12,6 +12,7 @@ This is a Node.js server application built with TypeScript, Express, and MongoDB
 - Filter media items by date range
 - Search media items by title
 - Pagination support for retrieving media items
+- GraphQL API for querying and mutating user and media data
 
 ## Technologies Used
 
@@ -23,6 +24,7 @@ This is a Node.js server application built with TypeScript, Express, and MongoDB
 - Bcrypt for password hashing
 - Zod for data validation
 - Winston for logging
+- Apollo Server for GraphQL API
 
 ## Getting Started
 
@@ -68,6 +70,8 @@ The server will start running on `http://localhost:3000`.
 
 ### API Endpoints
 
+#### REST API
+
 - `POST /auth/register`: Register a new user
 - `POST /auth/login`: User login
 - `POST /auth/logout`: User logout
@@ -78,6 +82,13 @@ The server will start running on `http://localhost:3000`.
 - `GET /media/readSingle/:id`: Retrieve a single media item by ID
 - `GET /media/filterByDate`: Filter media items by date range
 - `GET /media/search`: Search media items by title
+
+#### GraphQL API
+
+- `POST /graphqlUser`: GraphQL endpoint for user-related operations (no authentication required)
+- `POST /graphqlMedia`: GraphQL endpoint for media-related operations (authentication required)
+
+Please refer to the `src/graphql/user/schema.ts` and `src/graphql/media/schema.ts` files for the GraphQL schema definitions and available queries and mutations.
 
 ## Contributing
 
